@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffe6f0;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #movingContainer {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        img {
+            width: 230px;
+            height: 230px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #d63384;
+            margin: 15px 0;
+            user-select: none;
+        }
+
+        .btn-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        #yesBtn {
+            position: absolute;
+            z-index: 5;
+            font-size: 18px;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            white-space: nowrap;
+        }
+
+        #noBtn {
+            font-size: 18px;
+            padding: 12px 24px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        #noBtn.disabled {
+            pointer-events: none;
+            opacity: 0; /* Makes it disappear at the end */
+        }
+
+        .popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            z-index: 9999;
+        }
+
+        .popup.active {
+            visibility: visible;
+        }
+
+        .popup-box {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="yesBtn">YES! ❤️</button>
+
+    <div id="movingContainer">
+        <img src="c537ac95-6fe1-46fe-b03c-de61129b0146.jpg" alt="Cute Cat">
+        <h1>Will you be my Valentine?</h1>
+        <div class="btn-wrapper">
+            <div style="width: 100px; height: 1px; visibility: hidden;"></div>
+            <button id="noBtn">No 😢</button>
+        </div>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-box">
+            <h1 style="color: #d63384; margin-top:0;">YAY! Happy Valentines Day! 💘</h1>
+            <img src="200w.gif" alt="Happy Dance">
+            <br>
+            <button style="margin-top:20px; padding:10px 20px; cursor:pointer;" onclick="location.reload()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        let scale = 1;
+        let textIndex = 0;
+        const messages = [
+            "Are you sure?",
+            "Really sure?",
+            "Think again…",
+            "Please? 🥺",
+            "Don't break my heart…",
+            "Last chance…"
+        ];
+
+        const yesBtn = document.getElementById("yesBtn");
+        const noBtn = document.getElementById("noBtn");
+        const movingContainer = document.getElementById("movingContainer");
+        const popup = document.getElementById("popup");
+
+        function initPositions() {
+            const containerY = (window.innerHeight / 2) - (movingContainer.offsetHeight / 2);
+            const containerX = (window.innerWidth / 2) - (movingContainer.offsetWidth / 2);
+            
+            movingContainer.style.left = `${containerX}px`;
+            movingContainer.style.top = `${containerY}px`;
+
+            // Position Yes button next to the initial No position
+            yesBtn.style.left = `calc(50% - 110px)`;
+            yesBtn.style.top = `calc(${containerY + movingContainer.offsetHeight - 45}px)`;
+        }
+
+        function teleportRest() {
+            const maxX = window.innerWidth - movingContainer.offsetWidth;
+            const maxY = window.innerHeight - movingContainer.offsetHeight;
+            movingContainer.style.left = `${Math.random() * maxX}px`;
+            movingContainer.style.top = `${Math.random() * maxY}px`;
+        }
+
+        noBtn.onclick = function () {
+            // 1. Move the rest of the elements
+            teleportRest();
+
+            // 2. Change text BEFORE checking if it's the last one
+            yesBtn.innerText = messages[textIndex];
+            
+            // 3. Check if we just reached "Last chance…"
+            if (messages[textIndex] === "Last chance…") {
+                noBtn.classList.add("disabled"); // No more No button!
+            }
+
+            // 4. Update index for next time
+            textIndex++;
+
+            // 5. Grow Yes Button
+            scale += 1.3;
+            yesBtn.style.transform = `scale(${scale})`;
+
+            // 6. Overlap logic
+            if (scale > 4) {
+                yesBtn.style.zIndex = "100";
+            }
+        };
+
+        yesBtn.onclick = function () {
+            popup.classList.add("active");
+        };
+
+        window.onload = initPositions;
+        window.onresize = initPositions;
+    </script>
+
+</body>
+</html>
